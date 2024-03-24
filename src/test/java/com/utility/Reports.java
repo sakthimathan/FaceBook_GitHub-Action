@@ -13,6 +13,10 @@ public class Reports {
 		// TODO Auto-generated method stub
 
 	}
+	private void mgr() {
+		// TODO Auto-generated method stub
+
+	}
 
 	private void m3() {
 		// TODO Auto-generated method stub
