@@ -9,7 +9,7 @@ public class Demo_Check {
 		// TODO Auto-generated method stub
 
 	}
-	private void m1() {
+	private void simbu() {
 		// TODO Auto-generated method stub
 
 	}
