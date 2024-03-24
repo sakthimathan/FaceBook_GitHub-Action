@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="2" parallel="tests" name="Failed suite [Suite]" guice-stage="DEVELOPMENT">
+  <test thread-count="2" parallel="tests" name="FIREFOXTEST(failed)">
+    <parameter name="BROWSERNAME" value="FIREFOX"/>
+    <classes>
+      <class name="com.adactin.AdactinHotel">
+        <methods>
+          <include name="endTime"/>
+          <include name="reLog"/>
+          <include name="BrowserLaunch"/>
+          <include name="itenary"/>
+          <include name="selectTest"/>
+          <include name="confirmBookTest"/>
+          <include name="searchTest"/>
+          <include name="loginTest"/>
+          <include name="BookHotelTest"/>
+          <include name="closeBrowser"/>
+          <include name="startTime"/>
+        </methods>
+      </class> <!-- com.adactin.AdactinHotel -->
+    </classes>
+  </test> <!-- FIREFOXTEST(failed) -->
+  <test thread-count="2" parallel="tests" name="CHROMETEST(failed)">
+    <parameter name="BROWSERNAME" value="CHROME"/>
+    <classes>
+      <class name="com.adactin.AdactinHotel">
+        <methods>
+          <include name="endTime"/>
+          <include name="reLog"/>
+          <include name="BrowserLaunch"/>
+          <include name="itenary"/>
+          <include name="selectTest"/>
+          <include name="confirmBookTest"/>
+          <include name="searchTest"/>
+          <include name="BookHotelTest"/>
+          <include name="closeBrowser"/>
+          <include name="startTime"/>
+        </methods>
+      </class> <!-- com.adactin.AdactinHotel -->
+    </classes>
+  </test> <!-- CHROMETEST(failed) -->
+</suite> <!-- Failed suite [Suite] -->
