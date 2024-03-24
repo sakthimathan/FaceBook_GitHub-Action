@@ -32,6 +32,16 @@ public class Reports {
 
 	}
 
+	private void m9() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void m10() {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void m7() {
 		// TODO Auto-generated method stub
 
