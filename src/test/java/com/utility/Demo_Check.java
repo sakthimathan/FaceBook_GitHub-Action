@@ -6,9 +6,5 @@ public class Demo_Check {
 		// TODO Auto-generated method stub
 
 	}
-	private void m2() {
-		// TODO Auto-generated method stub
-
-	}
-
+	
 }
