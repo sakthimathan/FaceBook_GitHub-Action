@@ -1,5 +1,7 @@
 package com.utility;
 
+import java.rmi.dgc.VMID;
+
 public class Reports {
 
 	private void M1() {
@@ -56,6 +58,14 @@ public class Reports {
 
 	}
 	private void m11() {
+		// TODO Auto-generated method stub
+
+	}
+	private void vm() {
+		// TODO Auto-generated method stub
+
+	}
+	private void vm2() {
 		// TODO Auto-generated method stub
 
 	}
