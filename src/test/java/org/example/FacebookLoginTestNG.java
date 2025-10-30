@@ -70,8 +70,6 @@ public class FacebookLoginTestNG {
     }
 
 
-
-
     @BeforeMethod(alwaysRun = true)
     public void setUp(Method method) {
         // create an Extent test for this test method
