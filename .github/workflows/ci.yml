@@ -22,16 +22,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          cache: 'maven'
 
-      # Step 3: Cache local Maven repository
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
+
 
       # Step 4: Clean up old screenshots
       - name: Clean up old screenshots
@@ -50,7 +42,7 @@ jobs:
 
       # Step 6: Build Maven project
       - name: Build Maven project
-        run: mvn clean install -DskipTests=true
+        run: mvn clean compile
 
       # Step 7: Run Selenium TestNG tests
       - name: Run Selenium tests with TestNG
