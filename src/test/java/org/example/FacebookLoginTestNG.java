@@ -41,6 +41,8 @@ public class FacebookLoginTestNG {
     private WebDriver driver;
     private WebDriverWait wait;
 
+
+
     // ExtentReports objects
     private static ExtentReports extent;
     private ExtentTest testReport;
