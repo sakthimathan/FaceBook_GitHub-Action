@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+
+      - name: Cache local Maven repo
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Install Google Chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: latest
+
+      - name: Install Xvfb (virtual frame buffer for browsers)
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Run Maven tests (headless via Xvfb)
+        env:
+          MAVEN_OPTS: -Xmx2G
+          # Ensure any interactive debug sentinel is disabled in CI
+          KEEP_BROWSER_OPEN: "false"
+          FB_CAPTCHA_TIMEOUT_SECONDS: "30"
+        run: |
+          xvfb-run -a mvn -B test
+
