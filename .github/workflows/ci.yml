@@ -42,7 +42,7 @@ jobs:
 
       # Step 7: Run Selenium TestNG tests
       - name: Run Selenium tests with TestNG
-        run: mvn test
+        run: mvn test -DsuiteXmlFile=testng.xml
 
       # Step 8: Upload Extent Report
       - name: Upload Extent Report
