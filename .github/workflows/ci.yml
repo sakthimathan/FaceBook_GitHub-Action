@@ -46,3 +46,9 @@ jobs:
         run: |
           xvfb-run -a mvn -B test
 
+      - name: Upload ExtentReports artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-reports
+          path: target/extent-reports

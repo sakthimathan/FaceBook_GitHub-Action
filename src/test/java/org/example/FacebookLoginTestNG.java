@@ -10,11 +10,14 @@ import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchKey;
@@ -25,6 +28,11 @@ import java.nio.file.NoSuchFileException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.MediaEntityBuilder;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+
 public class FacebookLoginTestNG {
 
     private static String email;
@@ -32,6 +40,10 @@ public class FacebookLoginTestNG {
 
     private WebDriver driver;
     private WebDriverWait wait;
+
+    // ExtentReports objects
+    private static ExtentReports extent;
+    private ExtentTest testReport;
 
     @BeforeClass(alwaysRun = true)
     public void checkCredentials() {
@@ -42,8 +54,27 @@ public class FacebookLoginTestNG {
         }
     }
 
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
+        try {
+            Path reportsDir = Path.of("target", "extent-reports");
+            Files.createDirectories(reportsDir);
+            String reportPath = reportsDir.resolve("extent-report.html").toAbsolutePath().toString();
+            ExtentSparkReporter spark = new ExtentSparkReporter(reportPath);
+            extent = new ExtentReports();
+            extent.attachReporter(spark);
+            System.out.println("Initialized ExtentReports at: " + reportPath);
+        } catch (Exception e) {
+            System.err.println("Failed to initialize ExtentReports: " + e.getMessage());
+        }
+    }
+
     @BeforeMethod(alwaysRun = true)
-    public void setUp() {
+    public void setUp(Method method) {
+        // create an Extent test for this test method
+        if (extent != null) {
+            testReport = extent.createTest(method.getName());
+        }
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         // options.addArguments("--headless=new"); // uncomment for headless runs
@@ -51,11 +82,15 @@ public class FacebookLoginTestNG {
         options.addArguments("--disable-blink-features=AutomationControlled");
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        if (testReport != null) {
+            testReport.info("Launched ChromeDriver and created WebDriverWait");
+        }
     }
 
     @Test(description = "Simple Facebook login using credentials from environment variables")
     public void testFacebookLogin() {
         driver.get("https://www.facebook.com/");
+        if (testReport != null) testReport.info("Opened facebook.com");
 
         // Try to dismiss cookie banner / dialogs if present (best-effort)
         try {
@@ -70,17 +105,21 @@ public class FacebookLoginTestNG {
         // Fill in credentials
         By emailLocator = By.id("email");
         wait.until(ExpectedConditions.visibilityOfElementLocated(emailLocator)).sendKeys(email);
+        if (testReport != null) testReport.info("Entered email");
 
         By passLocator = By.id("pass");
         driver.findElement(passLocator).sendKeys(password);
+        if (testReport != null) testReport.info("Entered password");
 
         // Click login button
         By loginButton = By.name("login");
         try {
             wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
+            if (testReport != null) testReport.info("Clicked login button");
         } catch (Exception e) {
             By alt = By.xpath("//button[@type='submit']");
             wait.until(ExpectedConditions.elementToBeClickable(alt)).click();
+            if (testReport != null) testReport.info("Clicked fallback submit button");
         }
 
         // --- CAPTCHA / "I'm not a robot" detection ---
@@ -99,9 +138,11 @@ public class FacebookLoginTestNG {
                         Files.createFile(captchaSentinel);
                     }
                     System.out.println("CAPTCHA detected — created sentinel: " + captchaSentinel.toAbsolutePath());
+                    if (testReport != null) testReport.warning("CAPTCHA detected; waiting for manual solve. Sentinel: " + captchaSentinel.toAbsolutePath());
                     System.out.println("Please solve the CAPTCHA in the browser. Delete the file to continue and finish the test.");
                     waitForDeletion(captchaSentinel);
                     System.out.println("CAPTCHA sentinel removed — resuming test.");
+                    if (testReport != null) testReport.info("CAPTCHA sentinel removed — resumed test");
                 } catch (Exception ex) {
                     System.err.println("Failed to create captcha sentinel: " + ex.getMessage());
                 }
@@ -127,6 +168,10 @@ public class FacebookLoginTestNG {
         }
 
         Assert.assertTrue(loggedIn, "Login not detected - possible wrong credentials, 2FA, or checkpoint. Current URL: " + driver.getCurrentUrl());
+        if (testReport != null) {
+            if (loggedIn) testReport.pass("Login detected. Current URL: " + driver.getCurrentUrl());
+            else testReport.fail("Login not detected. Current URL: " + driver.getCurrentUrl());
+        }
     }
 
     // Wait for the file to be deleted. Prefer using WatchService; fallback to polling if unavailable.
@@ -150,7 +195,7 @@ public class FacebookLoginTestNG {
                     return;
                 }
                 while (true) {
-                    long pollMillis = 0;
+                    long pollMillis;
                     if (deadline > 0) {
                         long remaining = deadline - System.currentTimeMillis();
                         if (remaining <= 0) {
@@ -201,13 +246,21 @@ public class FacebookLoginTestNG {
     @AfterMethod(alwaysRun = true)
     public void tearDown(ITestResult result) {
         try {
-            if (!result.isSuccess() && driver instanceof TakesScreenshot) {
+            if (driver instanceof TakesScreenshot) {
                 TakesScreenshot ts = (TakesScreenshot) driver;
                 File src = ts.getScreenshotAs(OutputType.FILE);
                 Path dst = Path.of("target", "screenshots", result.getName() + ".png");
                 Files.createDirectories(dst.getParent());
                 Files.copy(src.toPath(), dst);
-                System.out.println("Saved failure screenshot to: " + dst.toAbsolutePath());
+                System.out.println("Saved screenshot to: " + dst.toAbsolutePath());
+                if (testReport != null) {
+                    String rel = dst.toString();
+                    if (!result.isSuccess()) {
+                        testReport.fail(result.getThrowable(), MediaEntityBuilder.createScreenCaptureFromPath(rel).build());
+                    } else {
+                        testReport.pass("Test passed", MediaEntityBuilder.createScreenCaptureFromPath(rel).build());
+                    }
+                }
             }
         } catch (Exception e) {
             System.err.println("Failed to capture screenshot: " + e.getMessage());
@@ -247,4 +300,13 @@ public class FacebookLoginTestNG {
             }
         }
     }
+
+    @AfterSuite(alwaysRun = true)
+    public void afterSuite() {
+        if (extent != null) {
+            extent.flush();
+            System.out.println("Flushed ExtentReports");
+        }
+    }
+
 }
