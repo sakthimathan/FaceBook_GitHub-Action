@@ -36,10 +36,6 @@ jobs:
             echo "No previous screenshots found."
           )
 
-      # Step 5: Install Google Chrome
-      - name: Install Google Chrome
-        run: choco install googlechrome --ignore-checksums -y
-
       # Step 6: Build Maven project
       - name: Build Maven project
         run: mvn clean compile
