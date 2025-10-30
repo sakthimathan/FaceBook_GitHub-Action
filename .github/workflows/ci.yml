@@ -2,53 +2,61 @@ name: CI - Selenium Test with Extent Report
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: []self-hosted,Windows]         # or 'windows-latest' if GitHub-hosted
-                # your self-hosted runner label
+    runs-on: [self-hosted, Windows]
 
     steps:
       # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Java JDK 21
-      - name: Set up Java 21
+      # Step 2: Set up JDK 11
+      - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '11'
+          cache: 'maven'
 
-      # Step 3: Clean up old screenshots
-      - name: Clean old screenshots
+      # Step 3: Cache local Maven repository
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      # Step 4: Clean up old screenshots
+      - name: Clean up old screenshots
         run: |
-          echo "Deleting old screenshots..."
-          if (Test-Path "screenshots") {
-            Remove-Item "screenshots\*" -Recurse -Force
+          echo "Cleaning up old screenshots..."
+          if exist screenshots (
+            del /s /q screenshots\*
             echo "Old screenshots deleted successfully."
-          } else {
-            echo "No screenshots folder found."
-          }
-        shell: powershell
+          ) else (
+            echo "No previous screenshots found."
+          )
 
-      # Step 4: Install Chrome browser (for Selenium)
+      # Step 5: Install Google Chrome
       - name: Install Google Chrome
-        run: |
-          choco install googlechrome --ignore-checksums -y
-        shell: powershell
+        run: choco install googlechrome --ignore-checksums -y
 
-      # Step 5: Build project with Maven
-      - name: Build with Maven
+      # Step 6: Build Maven project
+      - name: Build Maven project
         run: mvn clean install -DskipTests=true
 
-      # Step 6: Run Selenium TestNG tests
-      - name: Run TestNG tests
+      # Step 7: Run Selenium TestNG tests
+      - name: Run Selenium tests with TestNG
         run: mvn test
 
-      # Step 7: Upload Extent Report (if generated in test-output/)
+      # Step 8: Upload Extent Report
       - name: Upload Extent Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -57,9 +65,9 @@ jobs:
           path: |
             test-output/
             reports/
-            extent-reports/
+            target/extent-reports/
 
-      # Step 8: Upload Screenshots as Artifacts (if any)
+      # Step 9: Upload Screenshots (if generated)
       - name: Upload Screenshots
         if: always()
         uses: actions/upload-artifact@v4
