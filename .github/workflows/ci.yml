@@ -1,71 +1,60 @@
-name: CI - Selenium Test with Extent Report
+name: CI - Selenium Tests with Extent Report
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
-
   schedule:
-    - cron: "*/5 * * * *" # Runs every 5 minutes
+    - cron: "*/10 * * * *" # Runs every 10 minutes
 
 jobs:
-  build:
-    runs-on: [self-hosted, TestRunners]
+  selenium-tests:
+    runs-on: [self-hosted, TestRunners]  # Custom labels for your runner
 
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout repository
+      # Step 1: Checkout the repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 11
-      - name: Set up JDK 11
+      # Step 3: Set up JDK 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
+          java-version: '21'
           distribution: 'temurin'
-          java-version: '11'
 
-      # Step 3: Verify Java installation
-      - name: Verify Java version
-        run: java -version
-        shell: powershell
-
-      # Step 4: Clean up old screenshots (PowerShell version)
-      - name: Clean up old screenshots
-        shell: powershell
+      # Step 4: Clean up old screenshots and reports (older than 7 days)
+      - name: Clean up old screenshots and reports
         run: |
-          Write-Host "Cleaning up old screenshots..."
-          if (Test-Path "screenshots") {
-            Remove-Item "screenshots\*" -Recurse -Force
-            Write-Host "Old screenshots deleted successfully."
-          } else {
-            Write-Host "No previous screenshots found."
-          }
+          if [ -d "test-output" ]; then
+            echo "Cleaning up old test-output files..."
+            find test-output/ -type f -mtime +7 -delete
+          fi
+          if [ -d "screenshots" ]; then
+            echo "Cleaning up old screenshots..."
+            find screenshots/ -type f -mtime +7 -delete
+          fi
 
-      # Step 5: Build Maven project
-      - name: Build Maven project
+      # Step 5: Build the project with Maven
+      - name: Build with Maven
         run: mvn clean compile
-        shell: powershell
 
-      # Step 6: Run Selenium TestNG tests
-      - name: Run Selenium tests with TestNG
-        run: mvn test -DsuiteXmlFile=testng.xml
-        shell: powershell
+      # Step 6: Run Selenium Tests with TestNG
+      - name: Run Selenium Tests with TestNG
+        run: mvn test -DsuiteXmlFile=testing.xml
 
-      # Step 7: Upload Extent Report
+      # Step 7: Upload Extent Report as artifact
       - name: Upload Extent Report
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Extent-Report
-          path: |
-            test-output/
-            reports/
-            target/extent-reports/
+          name: extent-report
+          path: test-output/extent-report.html
+        if: always() # Runs even if tests fail
 
-      # Step 8: Upload Screenshots (if generated)
+      # Step 8: Upload Screenshots as artifact
       - name: Upload Screenshots
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Screenshots
+          name: screenshots
           path: screenshots/
+        if: always()
