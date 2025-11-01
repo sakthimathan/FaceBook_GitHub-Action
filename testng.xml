@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Suite" parallel="tests" thread-count="2">
-  <test  name="CHROMETEST" >
-	  <parameter name="BROWSERNAME" value="CHROME"></parameter>
+<suite name="Adactin Test Suite">
+  <test name="Default Tests">
     <classes>
+      <!-- Example: include main test class(es). Add or adjust class names as needed. -->
       <class name="com.adactin.AdactinHotel"/>
+      <!-- You can add more classes here, or use packages in secondary suite files. -->
     </classes>
-  </test> <!-- CHROME -->
-  
-   <test  name="FIREFOXTEST">
-	   <parameter name="BROWSERNAME" value="FIREFOX"></parameter>
-    <classes>
-      <class name="com.adactin.AdactinHotel"/>
-    </classes>
-  </test> <!-- FIREFOX -->
-</suite> <!-- Suite -->
- 
+  </test>
+</suite>
+

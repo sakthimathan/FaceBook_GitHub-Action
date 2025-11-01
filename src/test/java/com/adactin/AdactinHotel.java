@@ -56,7 +56,7 @@ public class AdactinHotel extends UtilityClass {
 	public void loginTest() {
 
 		LoginPage lp = new LoginPage();
-		lp.goLogin("SrihariMahendran", "India@2024");
+		lp.goLogin("mathansakthi ", "07ZWUM");
 
 	}
 
