@@ -57,7 +57,8 @@ public class FacebookLoginTestNG {
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite() {
         try {
-            Path reportsDir = Path.of("target", "extent-reports");
+            // Changed report directory to test-output to match CI artifact path
+            Path reportsDir = Path.of("test-output");
             Files.createDirectories(reportsDir);
             String reportPath = reportsDir.resolve("extent-report.html").toAbsolutePath().toString();
             ExtentSparkReporter spark = new ExtentSparkReporter(reportPath);
@@ -253,7 +254,8 @@ public class FacebookLoginTestNG {
             if (driver instanceof TakesScreenshot) {
                 TakesScreenshot ts = (TakesScreenshot) driver;
                 File src = ts.getScreenshotAs(OutputType.FILE);
-                Path dst = Path.of("target", "screenshots", result.getName() + ".png");
+                // save screenshots to top-level screenshots/ directory so GH Actions can upload them
+                Path dst = Path.of("screenshots", result.getName() + ".png");
                 Files.createDirectories(dst.getParent());
                 Files.copy(src.toPath(), dst);
                 System.out.println("Saved screenshot to: " + dst.toAbsolutePath());
