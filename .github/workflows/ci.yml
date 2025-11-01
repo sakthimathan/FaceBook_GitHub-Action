@@ -23,17 +23,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Step 4: Clean up old screenshots and reports (older than 7 days)
-      - name: Clean up old screenshots and reports
-        run: |
-          if [ -d "test-output" ]; then
-            echo "Cleaning up old test-output files..."
-            find test-output/ -type f -mtime +7 -delete
-          fi
-          if [ -d "screenshots" ]; then
-            echo "Cleaning up old screenshots..."
-            find screenshots/ -type f -mtime +7 -delete
-          fi
 
       # Step 5: Build the project with Maven
       - name: Build with Maven
