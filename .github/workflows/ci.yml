@@ -9,7 +9,7 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, SAKTHI]  # Custom labels for your runner
+    runs-on: [self-hosted]  # Custom labels for your runner
 
     steps:
       # Step 1: Checkout the repository
