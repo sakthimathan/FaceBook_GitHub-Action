@@ -3,13 +3,14 @@ name: CI - Selenium Test with Extent Report
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
+
+  schedule:
+    - cron: "*/5 * * * *" # Runs every 5 minutes
 
 jobs:
   build:
-    runs-on: [self-hosted, Windows]
+    runs-on: [self-hosted, Windows, TestRunners]
 
     steps:
       # Step 1: Checkout repository
@@ -23,28 +24,34 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
+      # Step 3: Verify Java installation
+      - name: Verify Java version
+        run: java -version
+        shell: powershell
 
-
-      # Step 4: Clean up old screenshots
+      # Step 4: Clean up old screenshots (PowerShell version)
       - name: Clean up old screenshots
+        shell: powershell
         run: |
-          echo "Cleaning up old screenshots..."
-          if exist screenshots (
-            del /s /q screenshots\*
-            echo "Old screenshots deleted successfully."
-          ) else (
-            echo "No previous screenshots found."
-          )
+          Write-Host "Cleaning up old screenshots..."
+          if (Test-Path "screenshots") {
+            Remove-Item "screenshots\*" -Recurse -Force
+            Write-Host "Old screenshots deleted successfully."
+          } else {
+            Write-Host "No previous screenshots found."
+          }
 
-      # Step 6: Build Maven project
+      # Step 5: Build Maven project
       - name: Build Maven project
         run: mvn clean compile
+        shell: powershell
 
-      # Step 7: Run Selenium TestNG tests
+      # Step 6: Run Selenium TestNG tests
       - name: Run Selenium tests with TestNG
         run: mvn test -DsuiteXmlFile=testng.xml
+        shell: powershell
 
-      # Step 8: Upload Extent Report
+      # Step 7: Upload Extent Report
       - name: Upload Extent Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -55,7 +62,7 @@ jobs:
             reports/
             target/extent-reports/
 
-      # Step 9: Upload Screenshots (if generated)
+      # Step 8: Upload Screenshots (if generated)
       - name: Upload Screenshots
         if: always()
         uses: actions/upload-artifact@v4

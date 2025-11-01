@@ -36,7 +36,7 @@ public class FacebookLogin {
         }
     }
 
-    public void login(String email, String password) {
+    public void login(String email, String password) throws InterruptedException {
         By emailLocator = By.id("email");
         By passLocator = By.id("pass");
         By loginButton = By.name("login");
@@ -49,6 +49,7 @@ public class FacebookLogin {
         passField.clear();
         passField.sendKeys(password);
 
+        Thread.sleep(10000);
         try {
             wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
         } catch (Exception e) {

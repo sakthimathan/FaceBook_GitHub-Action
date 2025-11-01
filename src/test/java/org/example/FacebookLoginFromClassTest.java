@@ -38,7 +38,7 @@ public class FacebookLoginFromClassTest {
     }
 
     @Test
-    public void testLoginUsingPageObject() {
+    public void testLoginUsingPageObject() throws InterruptedException {
         fb.open();
         fb.acceptCookiesIfPresent();
         fb.login(DUMMY_EMAIL, DUMMY_PASSWORD);

@@ -57,4 +57,28 @@
 
     </dependencies>
 
+    <!-- Added build configuration: configure Maven Surefire plugin to run TestNG suite file 'testng.xml' -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M9</version>
+                <configuration>
+                    <!-- Point Surefire to your TestNG suite file -->
+                    <suiteXmlFiles>
+                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+
+                    <!-- Fork settings help when launching browsers from Maven runs -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+
+                    <!-- Optional: increase test logging to help debugging runs -->
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
