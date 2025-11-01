@@ -78,7 +78,7 @@ public class FacebookLoginTestNG {
         }
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        // options.addArguments("--headless=new"); // uncomment for headless runs
+         options.addArguments("--headless=new"); // uncomment for headless runs
         options.addArguments("--start-maximized");
         options.addArguments("--disable-blink-features=AutomationControlled");
         driver = new ChromeDriver(options);
@@ -87,6 +87,8 @@ public class FacebookLoginTestNG {
             testReport.info("Launched ChromeDriver and created WebDriverWait");
         }
     }
+
+
 
     @Test(description = "Simple Facebook login using credentials from environment variables")
     public void testFacebookLogin() {
