@@ -3,6 +3,8 @@
 <suite name="FacebookSuite" verbose="1" parallel="false">
 
 
+
+
     <test name="FacebookLoginTests">
         <classes>
             <class name="org.example.FacebookLoginFromClassTest" />
