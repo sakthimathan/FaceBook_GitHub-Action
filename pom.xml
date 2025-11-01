@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
@@ -14,26 +15,31 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies> <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+    <dependencies>
 
-        <!-- Selenium WebDriver -->
-
+        <!-- ✅ Selenium WebDriver -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>4.35.0</version>
-        </dependency> <!-- https://mvnrepository.com/artifact/io.appium/java-client -->
+        </dependency>
 
-        <!-- Appium Java client -->
-
+        <!-- ✅ Appium Java Client -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
             <version>10.0.0</version>
-        </dependency> <!-- https://mvnrepository.com/artifact/org.testng/testng -->
+        </dependency>
 
-        <!-- TestNG for testing framework -->
+        <!-- ✅ Lombok (annotation processor) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- ✅ TestNG (testing framework) -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -41,14 +47,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- WebDriverManager to manage driver binaries automatically -->
+        <!-- ✅ WebDriverManager (auto driver setup) -->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
             <version>5.4.1</version>
         </dependency>
 
-        <!-- ExtentReports for test reporting -->
+        <!-- ✅ ExtentReports (HTML reporting) -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
@@ -57,27 +63,42 @@
 
     </dependencies>
 
-    <!-- Added build configuration: configure Maven Surefire plugin to run TestNG suite file 'testng.xml' -->
     <build>
         <plugins>
+
+            <!-- ✅ Surefire Plugin (for TestNG suite execution) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version>
                 <configuration>
-                    <!-- Point Surefire to your TestNG suite file -->
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-
-                    <!-- Fork settings help when launching browsers from Maven runs -->
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
-
-                    <!-- Optional: increase test logging to help debugging runs -->
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
+
+            <!-- ✅ Compiler Plugin (Lombok Fix) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <fork>true</fork>
+                    <compilerArgs>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

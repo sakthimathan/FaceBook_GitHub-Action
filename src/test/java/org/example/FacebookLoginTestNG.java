@@ -177,6 +177,7 @@ public class FacebookLoginTestNG {
         }
     }
 
+
     // Wait for the file to be deleted. Prefer using WatchService; fallback to polling if unavailable.
     private void waitForDeletion(Path sentinel) {
         // Read optional timeout in seconds from env var FB_CAPTCHA_TIMEOUT_SECONDS (or 0 for no timeout)
