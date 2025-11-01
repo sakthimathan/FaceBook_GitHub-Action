@@ -36,6 +36,7 @@ public class FacebookLogin {
         }
     }
 
+
     public void login(String email, String password) throws InterruptedException {
         By emailLocator = By.id("email");
         By passLocator = By.id("pass");
