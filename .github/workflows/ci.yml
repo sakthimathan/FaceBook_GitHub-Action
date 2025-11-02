@@ -5,10 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, runner-1]  # ensure your runner has these labels
+    runs-on: [self-hosted, Windows,runner-2]
 
     steps:
       # Step 1: Checkout the repository
@@ -56,3 +55,19 @@ jobs:
         with:
           name: screenshots
           path: test-output/screenshots
+
+      # ✅ Step 8: Copy screenshots to local D drive (with timestamp)
+      - name: Copy Screenshots to Local D Drive
+        if: always()
+        shell: powershell
+        run: |
+          $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          $src = "test-output\screenshots"
+          $dest = "D:\GitHubScreenshots\$timestamp"
+          if (!(Test-Path $dest)) { New-Item -ItemType Directory -Force -Path $dest }
+          if (Test-Path $src) {
+            Copy-Item -Path "$src\*" -Destination $dest -Recurse -Force
+            Write-Host "✅ Screenshots copied to $dest"
+          } else {
+            Write-Host "⚠️ No screenshots found at $src"
+          }

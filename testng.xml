@@ -7,6 +7,7 @@
     <listener class-name="com.utility.ExtentTestNGListener"/>
   </listeners>
 
+
   <test name="Default Tests">
 
       <parameter name="BROWSERNAME" value="chrome"/>
