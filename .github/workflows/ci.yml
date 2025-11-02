@@ -56,18 +56,36 @@ jobs:
           name: screenshots
           path: test-output/screenshots
 
-      # ✅ Step 8: Copy screenshots to local D drive (with timestamp)
-      - name: Copy Screenshots to Local D Drive
+          # ✅ Step 8: Copy Screenshots and Report to Local D drive (with timestamp)
+      - name: Copy Screenshots and Report to Local D Drive
         if: always()
         shell: powershell
         run: |
           $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-          $src = "test-output\screenshots"
+          $srcScreenshots = "test-output\screenshots"
+          $srcReport = "test-output\extent-report.html"
           $dest = "D:\GitHubScreenshots\$timestamp"
-          if (!(Test-Path $dest)) { New-Item -ItemType Directory -Force -Path $dest }
-          if (Test-Path $src) {
-            Copy-Item -Path "$src\*" -Destination $dest -Recurse -Force
-            Write-Host "✅ Screenshots copied to $dest"
-          } else {
-            Write-Host "⚠️ No screenshots found at $src"
+
+          # Create destination folder if not exists
+          if (!(Test-Path $dest)) {
+            New-Item -ItemType Directory -Force -Path $dest | Out-Null
           }
+
+          # Copy screenshots folder
+          if (Test-Path $srcScreenshots) {
+            Copy-Item -Path "$srcScreenshots\*" -Destination "$dest\screenshots" -Recurse -Force
+            Write-Host "✅ Screenshots copied to $dest\screenshots"
+          } else {
+            Write-Host "⚠️ No screenshots found at $srcScreenshots"
+          }
+
+          # Copy extent report
+          if (Test-Path $srcReport) {
+            Copy-Item -Path $srcReport -Destination "$dest\" -Force
+            Write-Host "✅ Extent report copied to $dest"
+          } else {
+            Write-Host "⚠️ Extent report not found at $srcReport"
+          }
+
+          Write-Host "🎯 All files stored under: $dest"
+
