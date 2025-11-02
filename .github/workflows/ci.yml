@@ -8,7 +8,7 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, SAKTHI]  # ensure your runner has these labels
+    runs-on: [self-hosted, runner-1]  # ensure your runner has these labels
 
     steps:
       # Step 1: Checkout the repository
