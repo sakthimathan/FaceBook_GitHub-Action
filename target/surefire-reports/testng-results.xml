@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="7" passed="7" failed="0" skipped="0">
+  <reporter-output>
+  </reporter-output>
+  <suite started-at="2025-11-02T15:17:02 IST" name="Adactin Test Suite" finished-at="2025-11-02T15:17:52 IST" duration-ms="49970">
+    <groups>
+    </groups>
+    <test started-at="2025-11-02T15:17:02 IST" name="Default Tests" finished-at="2025-11-02T15:17:52 IST" duration-ms="49970">
+      <class name="com.adactin.AdactinHotel">
+        <test-method is-config="true" signature="BrowserLaunch(java.lang.String,boolean)[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:02 IST" name="BrowserLaunch" finished-at="2025-11-02T15:17:07 IST" duration-ms="5133" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[chrome]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[false]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- BrowserLaunch -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:07 IST" name="startTime" finished-at="2025-11-02T15:17:07 IST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method signature="loginTest()[pri:1, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:07 IST" name="loginTest" finished-at="2025-11-02T15:17:08 IST" duration-ms="1278" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- loginTest -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:08 IST" name="endTime" finished-at="2025-11-02T15:17:08 IST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method signature="searchTest()[pri:2, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:08 IST" name="searchTest" finished-at="2025-11-02T15:17:10 IST" duration-ms="1903" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- searchTest -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:08 IST" name="startTime" finished-at="2025-11-02T15:17:08 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:11 IST" name="endTime" finished-at="2025-11-02T15:17:11 IST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method signature="selectTest()[pri:3, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:11 IST" name="selectTest" finished-at="2025-11-02T15:17:11 IST" duration-ms="567" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- selectTest -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:11 IST" name="startTime" finished-at="2025-11-02T15:17:11 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:12 IST" name="endTime" finished-at="2025-11-02T15:17:12 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:12 IST" name="startTime" finished-at="2025-11-02T15:17:12 IST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method signature="BookHotelTest()[pri:4, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:12 IST" name="BookHotelTest" finished-at="2025-11-02T15:17:13 IST" duration-ms="1332" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- BookHotelTest -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:13 IST" name="endTime" finished-at="2025-11-02T15:17:13 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:13 IST" name="startTime" finished-at="2025-11-02T15:17:13 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method signature="confirmBookTest()[pri:5, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:13 IST" name="confirmBookTest" finished-at="2025-11-02T15:17:19 IST" duration-ms="5361" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- confirmBookTest -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:19 IST" name="endTime" finished-at="2025-11-02T15:17:19 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:19 IST" name="startTime" finished-at="2025-11-02T15:17:19 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method signature="itenary()[pri:6, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:19 IST" name="itenary" finished-at="2025-11-02T15:17:50 IST" duration-ms="31246" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- itenary -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:50 IST" name="endTime" finished-at="2025-11-02T15:17:50 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method signature="reLog()[pri:7, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:50 IST" name="reLog" finished-at="2025-11-02T15:17:51 IST" duration-ms="480" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- reLog -->
+        <test-method is-config="true" signature="startTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:50 IST" name="startTime" finished-at="2025-11-02T15:17:50 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- startTime -->
+        <test-method is-config="true" signature="endTime()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:51 IST" name="endTime" finished-at="2025-11-02T15:17:51 IST" duration-ms="1" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- endTime -->
+        <test-method is-config="true" signature="closeBrowser()[pri:0, instance:com.adactin.AdactinHotel@295eaa7c]" started-at="2025-11-02T15:17:51 IST" name="closeBrowser" finished-at="2025-11-02T15:17:52 IST" duration-ms="337" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- closeBrowser -->
+      </class> <!-- com.adactin.AdactinHotel -->
+    </test> <!-- Default Tests -->
+  </suite> <!-- Adactin Test Suite -->
+</testng-results>

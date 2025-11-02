@@ -22,11 +22,11 @@ import com.utility.UtilityClass;
 public class AdactinHotel extends UtilityClass {
 	// public static WebDriver driver;
 
-	@Parameters({ "BROWSERNAME" })
+	@Parameters({ "BROWSERNAME", "CICD" })
 	// @Test(priority = 0)
 	@BeforeClass
-	public void BrowserLaunch(String BROWSERNAME) {
-		switchDrivers(BROWSERNAME);
+	public void BrowserLaunch(String BROWSERNAME, boolean CICD) {
+		switchDrivers(BROWSERNAME, CICD);
 		getUrl("https://adactinhotelapp.com/");
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
 		maximizeWindow();

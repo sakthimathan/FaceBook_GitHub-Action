@@ -7,11 +7,10 @@
     <listener class-name="com.utility.ExtentTestNGListener"/>
   </listeners>
 
-
-
   <test name="Default Tests">
 
       <parameter name="BROWSERNAME" value="chrome"/>
+      <parameter name="CICD" value="true"/>
 
     <classes>
       <!-- Example: include main test class(es). Add or adjust class names as needed. -->

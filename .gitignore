@@ -1,0 +1,54 @@
+# Maven
+/target/
+
+# IntelliJ
+/.idea/
+*.iml
+/out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Test outputs & reports
+/test-output/
+/screenshots/
+/testng-results.xml
+/testng-failed.xml
+/emailable-report*.html
+/extent-report.html
+
+# WebDriverManager caches and logs
+/.cache/
+/selenium-server-*.log
+
+# Logs and temp
+*.log
+*.tmp
+*.temp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# VS Code
+.vscode/
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# backup files
+*~
+
+# compiled classes
+*.class
+
+# Others
+.idea_modules/
+
+

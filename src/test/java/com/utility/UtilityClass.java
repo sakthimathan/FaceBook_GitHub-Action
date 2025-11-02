@@ -13,16 +13,27 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverInfo;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.GeckoDriverInfo;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
+
 public class UtilityClass {
 
 	public static WebDriver driver ;
-	
+
+	// Backward-compatible overload: default to non-CICD (interactive) mode
 	public void switchDrivers(String Browser) {
+		// Delegate to the two-argument method with cicd=false
+		switchDrivers(Browser, false);
+	}
+
+	// Updated switchDrivers to accept a CICD flag and delegate to helper methods
+	public void switchDrivers(String Browser, boolean cicd) {
 		// Handle null/empty and be case-insensitive so TestNG parameters like "chrome" or "CHROME" both work
 		if (Browser == null || Browser.trim().isEmpty()) {
 			System.out.println("BROWSER NOT SELECTED");
@@ -30,16 +41,57 @@ public class UtilityClass {
 		}
 		String b = Browser.trim();
 		if (b.equalsIgnoreCase("chrome")) {
-			driver = new ChromeDriver();
+			if (cicd) {
+				launchChromeCICD();
+			} else {
+				launchChrome();
+			}
 		} else if (b.equalsIgnoreCase("firefox")) {
-			driver = new FirefoxDriver();
+			if (cicd) {
+				launchFirefoxCICD();
+			} else {
+				launchFirefox();
+			}
 		} else {
 			System.out.println("BROWSER NOT SELECTED: " + Browser);
 		}
 	}
 
+	// Launch Chrome in normal (interactive) mode
+	public void launchChrome() {
+		// Ensure driver binary is available
+		WebDriverManager.chromedriver().setup();
+		driver = new ChromeDriver();
+	}
+
+	// Launch Chrome configured for CI (headless + common flags)
+	public void launchChromeCICD() {
+		WebDriverManager.chromedriver().setup();
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--headless=new");
+		options.addArguments("--disable-gpu");
+		options.addArguments("--window-size=1920,1080");
+		options.addArguments("--no-sandbox");
+		driver = new ChromeDriver(options);
+	}
+
+	// Launch Firefox in normal (interactive) mode
+	public void launchFirefox() {
+		WebDriverManager.firefoxdriver().setup();
+		driver = new FirefoxDriver();
+	}
+
+	// Launch Firefox configured for CI (headless)
+	public void launchFirefoxCICD() {
+		WebDriverManager.firefoxdriver().setup();
+		FirefoxOptions fo = new FirefoxOptions();
+		fo.addArguments("-headless");
+		driver = new FirefoxDriver(fo);
+	}
+
 	public static void getDriver() {
 
+		WebDriverManager.chromedriver().setup();
 		driver = new ChromeDriver();
 	}
 
