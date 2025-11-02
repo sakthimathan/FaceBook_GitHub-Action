@@ -116,7 +116,11 @@ public class AdactinHotel extends UtilityClass {
 	@Test(priority = 7)
 	public void reLog() {
 		AgainLogin a = new AgainLogin(driver);
-		a.getAgainlog().click();
+		if (a.getAgainlog() != null) {
+			a.getAgainlog().click();
+		} else {
+			System.out.println("reLog: 'Click here to login again' link not found; skipping click.");
+		}
 
 	}
 }

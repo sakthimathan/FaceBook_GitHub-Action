@@ -23,13 +23,18 @@ public class UtilityClass {
 	public static WebDriver driver ;
 	
 	public void switchDrivers(String Browser) {
-		 if (Browser.equals("CHROME") ) {
-			 driver = new ChromeDriver();
-			 
-		}else if ( Browser.equals("FIREFOX")) {
-			 driver =new FirefoxDriver();
-		} else {
+		// Handle null/empty and be case-insensitive so TestNG parameters like "chrome" or "CHROME" both work
+		if (Browser == null || Browser.trim().isEmpty()) {
 			System.out.println("BROWSER NOT SELECTED");
+			return;
+		}
+		String b = Browser.trim();
+		if (b.equalsIgnoreCase("chrome")) {
+			driver = new ChromeDriver();
+		} else if (b.equalsIgnoreCase("firefox")) {
+			driver = new FirefoxDriver();
+		} else {
+			System.out.println("BROWSER NOT SELECTED: " + Browser);
 		}
 	}
 
@@ -233,6 +238,31 @@ public class UtilityClass {
 		TakesScreenshot ts = (TakesScreenshot) driver;
 		File screenshotAs = ts.getScreenshotAs(OutputType.FILE);
 		return screenshotAs;
+	}
+
+	/**
+	 * Save a screenshot to test-output/screenshots with the given base name and timestamp.
+	 * Returns the absolute path to the saved file or null if failed.
+	 */
+	public static String saveScreenshot(String baseName) {
+		try {
+			if (driver == null) {
+				System.out.println("saveScreenshot: driver is null");
+				return null;
+			}
+			File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+			java.nio.file.Path screenshotsDir = java.nio.file.Paths.get("test-output", "screenshots");
+			if (!java.nio.file.Files.exists(screenshotsDir)) {
+				java.nio.file.Files.createDirectories(screenshotsDir);
+			}
+			String filename = baseName + "_" + System.currentTimeMillis() + ".png";
+			File dest = screenshotsDir.resolve(filename).toFile();
+			org.apache.commons.io.FileUtils.copyFile(src, dest);
+			return dest.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public void mouseOverAction(WebElement element) {
