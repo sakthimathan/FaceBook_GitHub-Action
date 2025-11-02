@@ -8,7 +8,7 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, Windows]  # ensure your runner has these labels
+    runs-on: [self-hosted, SAKTHI]  # ensure your runner has these labels
 
     steps:
       # Step 1: Checkout the repository
@@ -55,4 +55,4 @@ jobs:
         if: always()
         with:
           name: screenshots
-          path: screenshots/
+          path: test-output/screenshots
