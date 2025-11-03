@@ -7,7 +7,7 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, Windows,runner-2]
+    runs-on: [self-hosted,runner-3]
 
     steps:
       # Step 1: Checkout the repository
