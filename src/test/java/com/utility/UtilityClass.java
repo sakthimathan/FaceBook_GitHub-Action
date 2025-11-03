@@ -17,6 +17,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.GeckoDriverInfo;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
@@ -40,17 +42,23 @@ public class UtilityClass {
 			return;
 		}
 		String b = Browser.trim();
-		if (b.equalsIgnoreCase("chrome")) {
+		if (b.equalsIgnoreCase("chrome") || b.equalsIgnoreCase("googlechrome")) {
 			if (cicd) {
 				launchChromeCICD();
 			} else {
 				launchChrome();
 			}
-		} else if (b.equalsIgnoreCase("firefox")) {
+		} else if (b.equalsIgnoreCase("firefox") || b.equalsIgnoreCase("mozilla")) {
 			if (cicd) {
 				launchFirefoxCICD();
 			} else {
 				launchFirefox();
+			}
+		} else if (b.equalsIgnoreCase("edge") || b.equalsIgnoreCase("msedge") || b.equalsIgnoreCase("microsoftedge")) {
+			if (cicd) {
+				launchEdgeCICD();
+			} else {
+				launchEdge();
 			}
 		} else {
 			System.out.println("BROWSER NOT SELECTED: " + Browser);
@@ -87,6 +95,106 @@ public class UtilityClass {
 		FirefoxOptions fo = new FirefoxOptions();
 		fo.addArguments("-headless");
 		driver = new FirefoxDriver(fo);
+	}
+
+	// Launch Edge in normal (interactive) mode
+	public void launchEdge() {
+		// 1) Prefer an explicit system property if set: webdriver.edge.driver
+		String propPath = System.getProperty("webdriver.edge.driver");
+		if (propPath != null && !propPath.isEmpty()) {
+			java.io.File f = new java.io.File(propPath);
+			if (f.exists()) {
+				System.out.println("Using Edge driver from system property webdriver.edge.driver: " + propPath);
+				driver = new EdgeDriver();
+				return;
+			}
+		}
+		// 2) Next, look for an environment variable EDGE_DRIVER_PATH
+		String envPath = System.getenv("EDGE_DRIVER_PATH");
+		if (envPath != null && !envPath.isEmpty()) {
+			java.io.File f = new java.io.File(envPath);
+			if (f.exists()) {
+				System.setProperty("webdriver.edge.driver", envPath);
+				System.out.println("Using Edge driver from env EDGE_DRIVER_PATH: " + envPath);
+				driver = new EdgeDriver();
+				return;
+			}
+		}
+		// 3) Try WebDriverManager to download/setup the driver
+		try {
+			WebDriverManager.edgedriver().setup();
+			driver = new EdgeDriver();
+			return;
+		} catch (Exception e) {
+			// 4) If that fails, log a helpful message and fall back to Chrome
+			System.err.println("[WARN] Unable to setup Edge driver via WebDriverManager: " + e.getMessage());
+			System.err.println("[WARN] To run Edge, either: (a) ensure the runner has network access so WebDriverManager can download msedgedriver, or (b) download the matching msedgedriver and set system property 'webdriver.edge.driver' or env 'EDGE_DRIVER_PATH' to its path.");
+			System.err.println("[WARN] Falling back to Chrome interactive mode.");
+			try {
+				launchChrome();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				throw new RuntimeException("Failed to launch Edge and fallback to Chrome also failed", ex);
+			}
+		}
+	}
+
+	// Launch Edge configured for CI (headless)
+	public void launchEdgeCICD() {
+		// 1) Prefer an explicit system property if set: webdriver.edge.driver
+		String propPath = System.getProperty("webdriver.edge.driver");
+		if (propPath != null && !propPath.isEmpty()) {
+			java.io.File f = new java.io.File(propPath);
+			if (f.exists()) {
+				System.out.println("Using Edge driver from system property webdriver.edge.driver: " + propPath);
+				EdgeOptions eo = new EdgeOptions();
+				eo.addArguments("--headless=new");
+				eo.addArguments("--disable-gpu");
+				eo.addArguments("--window-size=1920,1080");
+				eo.addArguments("--no-sandbox");
+				driver = new EdgeDriver(eo);
+				return;
+			}
+		}
+		// 2) Next, look for an environment variable EDGE_DRIVER_PATH
+		String envPath = System.getenv("EDGE_DRIVER_PATH");
+		if (envPath != null && !envPath.isEmpty()) {
+			java.io.File f = new java.io.File(envPath);
+			if (f.exists()) {
+				System.setProperty("webdriver.edge.driver", envPath);
+				System.out.println("Using Edge driver from env EDGE_DRIVER_PATH: " + envPath);
+				EdgeOptions eo = new EdgeOptions();
+				eo.addArguments("--headless=new");
+				eo.addArguments("--disable-gpu");
+				eo.addArguments("--window-size=1920,1080");
+				eo.addArguments("--no-sandbox");
+				driver = new EdgeDriver(eo);
+				return;
+			}
+		}
+		// 3) Try WebDriverManager to download/setup the driver
+		try {
+			WebDriverManager.edgedriver().setup();
+			EdgeOptions eo = new EdgeOptions();
+			// Edge uses Chromium under the hood; use similar headless flags
+			eo.addArguments("--headless=new");
+			eo.addArguments("--disable-gpu");
+			eo.addArguments("--window-size=1920,1080");
+			eo.addArguments("--no-sandbox");
+			driver = new EdgeDriver(eo);
+			return;
+		} catch (Exception e) {
+			// 4) If that fails, log a helpful message and fall back to Chrome headless
+			System.err.println("[WARN] Unable to setup Edge driver via WebDriverManager: " + e.getMessage());
+			System.err.println("[WARN] To run Edge, either: (a) ensure the runner has network access so WebDriverManager can download msedgedriver, or (b) download the matching msedgedriver and set system property 'webdriver.edge.driver' or env 'EDGE_DRIVER_PATH' to its path.");
+			System.err.println("[WARN] Falling back to Chrome CICD (headless) mode.");
+			try {
+				launchChromeCICD();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				throw new RuntimeException("Failed to launch EdgeCICD and fallback to ChromeCICD also failed", ex);
+			}
+		}
 	}
 
 	public static void getDriver() {
