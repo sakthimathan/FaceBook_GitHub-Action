@@ -60,7 +60,7 @@ jobs:
 
       # Step 7: Run Selenium Tests with TestNG suite
       - name: Run Selenium Tests with TestNG
-        run: mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
+        run: xvfb-run mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
 
       # Step 8: Upload Extent Report as artifact
       - name: Upload Extent Report
