@@ -2,7 +2,7 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Adactin Test Suite">
 
-  <!-- Register the ExtentReports TestNG listener to generate extent-report.html and attach screenshots -->
+
   <listeners>
     <listener class-name="com.utility.ExtentTestNGListener"/>
   </listeners>
