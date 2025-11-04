@@ -22,39 +22,20 @@ jobs:
           distribution: 'temurin'
 
       # Step 3: Install Google Chrome & ChromeDriver (Stable)
+      # This uses a dedicated action to reliably install chrome and the matching chromedriver
       - name: Install Google Chrome & ChromeDriver
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y wget unzip xvfb curl
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+          chromedriver-version: stable # Automatically matches the stable chrome version
 
-          echo "🔹 Adding Google Chrome repository..."
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | \
-            sudo tee /etc/apt/sources.list.d/google-chrome.list
-
-          sudo apt-get update -y
-          sudo apt-get install -y google-chrome-stable
-
-          echo "✅ Google Chrome installed successfully."
-          google-chrome --version
-
-          echo "🔹 Installing matching ChromeDriver..."
-          CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9.]+' | head -1 | cut -d'.' -f1)
-          DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-
-          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
-          unzip /tmp/chromedriver.zip -d /tmp/
-          sudo mv /tmp/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-
-          echo "✅ ChromeDriver installed successfully."
-          chromedriver --version
-
-      # Step 4: Verify Java and Maven installation
+      # Step 4: Verify Environment
       - name: Verify Environment
         run: |
           java -version
           mvn -version
+          google-chrome --version
+          chromedriver --version
           echo "Current directory:"
           pwd
 
