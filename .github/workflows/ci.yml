@@ -1,5 +1,3 @@
-yml : Windows
-
 
 name: CI - Selenium Tests with Extent Report (Windows Runner)
 
