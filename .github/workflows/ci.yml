@@ -57,7 +57,7 @@ jobs:
         if: always()
         run: |
           timestamp=$(date +"%Y%m%d_%H%M%S")
-          baseDest="/home/enovo/GitHubScreenshots/$timestamp"
+          baseDest="D:/GitHubScreenshots/$timestamp"
           
           srcScreenshots="test-output/screenshots"
           srcReport="test-output/extent-report.html"
