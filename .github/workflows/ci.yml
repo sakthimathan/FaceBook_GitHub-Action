@@ -25,42 +25,37 @@ jobs:
       - name: Update APT
         run: sudo apt-get update
 
-      # Step 4: Install Chrome dependencies
+      # Step 4: Install Chrome dependencies and XVFB (virtual screen)
+      # This is the fix for the 'libnspr4.so' error
       - name: Install dependencies
         run: |
           sudo apt-get install -y wget unzip xvfb libxss1 libayatana-appindicator3-1 \
-          libindicator7 libgbm1 libnss3 lsb-release
+          libindicator7 libgbm1 libnss3 lsb-release libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libasound2
 
-      # Step 5: Install Google Chrome
-      - name: Download Google Chrome
+      # Step 5: Setup Chrome and matching ChromeDriver (Robust Way)
+      # This action correctly finds the matching driver and adds them to the path.
+      # It replaces your manual download steps (5 and 6).
+      - name: Set up Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      # Step 6: Verify installations
+      - name: Verify Environment
         run: |
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb
-          sudo apt-get install -y /tmp/chrome.deb
-
-      - name: Verify Chrome installation
-        run: google-chrome --version
-
-      # Step 6: Install matching ChromeDriver
-      - name: Download matching ChromeDriver
-        run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9.]+' | head -1)
-          DRIVER_VERSION=$(wget -qO- "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHROME_VERSION")
-          wget -O /tmp/chromedriver.zip "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$DRIVER_VERSION/linux64/chromedriver-linux64.zip"
-          unzip /tmp/chromedriver.zip -d /tmp/chromedriver
-
-          sudo mv /tmp/chromedriver/chromedriver-linux64/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-
-      - name: Verify ChromeDriver
-        run: chromedriver --version
+          java -version
+          mvn -version
+          google-chrome --version
+          chromedriver --version
 
       # Step 7: Build with Maven
       - name: Build with Maven
         run: mvn clean compile
 
-      # Step 8: Run Selenium Tests
+      # Step 8: Run Selenium Tests using a virtual screen (Xvfb)
+      # This is critical for a headless Linux runner.
       - name: Run Selenium Tests with TestNG
-        run: mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
+        run: xvfb-run mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
 
       # Step 9: Upload Extent Report
       - name: Upload Extent Report
