@@ -1,4 +1,4 @@
-name: CI - Selenium Tests with Extent Report (Linux Runner)
+name: CI - Selenium Tests with Extent Report (Ubuntu Runner)
 
 on:
   push:
@@ -7,57 +7,36 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, Linux]
 
     steps:
       # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 21
+      # Step 2: Set up JDK 21 for Linux
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # Step 3: Update APT
-      - name: Update APT
-        run: sudo apt-get update
-
-      # Step 4: Install Chrome dependencies and XVFB (virtual screen)
-      # This is the fix for the 'libnspr4.so' error
-      - name: Install dependencies
-        run: |
-          sudo apt-get install -y wget unzip xvfb libxss1 libayatana-appindicator3-1 \
-          libindicator7 libgbm1 libnss3 lsb-release libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libasound2
-
-      # Step 5: Setup Chrome and matching ChromeDriver (Robust Way)
-      # This action correctly finds the matching driver and adds them to the path.
-      # It replaces your manual download steps (5 and 6).
-      - name: Set up Chrome and ChromeDriver
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
-
-      # Step 6: Verify installations
+      # Step 3: Verify Java & Maven
       - name: Verify Environment
         run: |
           java -version
           mvn -version
-          google-chrome --version
-          chromedriver --version
+          pwd
 
-      # Step 7: Build with Maven
+      # Step 4: Build project
       - name: Build with Maven
         run: mvn clean compile
 
-      # Step 8: Run Selenium Tests using a virtual screen (Xvfb)
-      # This is critical for a headless Linux runner.
+      # Step 5: Run Selenium Tests
       - name: Run Selenium Tests with TestNG
-        run: xvfb-run mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
+        run: mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
 
-      # Step 9: Upload Extent Report
+      # Step 6: Upload Extent Report as artifact
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
         if: always()
@@ -65,7 +44,7 @@ jobs:
           name: extent-report
           path: test-output/extent-report.html
 
-      # Step 10: Upload Screenshots
+      # Step 7: Upload screenshots
       - name: Upload Screenshots
         uses: actions/upload-artifact@v4
         if: always()
@@ -73,33 +52,37 @@ jobs:
           name: screenshots
           path: test-output/screenshots
 
-      # Step 11: Store Results Locally on Runner
-      - name: Copy Screenshots and Report to Local Folder
+      # ✅ Step 8: Copy report and screenshots to LOCAL LINUX DISK
+      - name: Copy Screenshots & Report to Local Folder
         if: always()
         run: |
           timestamp=$(date +"%Y%m%d_%H%M%S")
-          baseDest="$HOME/GitHubScreenshots/$timestamp"
+          baseDest="/home/runner/GitHubScreenshots/$timestamp"
+
           srcScreenshots="test-output/screenshots"
           srcReport="test-output/extent-report.html"
 
           destScreenshots="$baseDest/screenshots"
           destReports="$baseDest/reports"
 
+          # Create folders
           mkdir -p "$destScreenshots"
           mkdir -p "$destReports"
 
+          # Copy screenshots if present
           if [ -d "$srcScreenshots" ]; then
-            cp -r "$srcScreenshots"/* "$destScreenshots"/
+            cp -r "$srcScreenshots"/* "$destScreenshots" || true
             echo "✅ Screenshots copied to $destScreenshots"
           else
-            echo "⚠️ No screenshots found at $srcScreenshots"
+            echo "⚠️ No screenshots folder found at $srcScreenshots"
           fi
 
+          # Copy extent report
           if [ -f "$srcReport" ]; then
-            cp "$srcReport" "$destReports"/
+            cp "$srcReport" "$destReports/"
             echo "✅ Extent report copied to $destReports"
           else
-            echo "⚠️ Extent report not found at $srcReport"
+            echo "⚠️ No Extent Report found at $srcReport"
           fi
 
-          echo "🎯 All files stored under: $baseDest"
+          echo "🎯 All files saved under: $baseDest"
