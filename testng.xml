@@ -3,9 +3,6 @@
 <suite name="Adactin Test Suite">
 
 
-
-
-
   <listeners>
     <listener class-name="com.utility.ExtentTestNGListener"/>
   </listeners>
