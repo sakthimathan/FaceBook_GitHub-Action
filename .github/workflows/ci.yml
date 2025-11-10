@@ -52,37 +52,34 @@ jobs:
           name: screenshots
           path: test-output/screenshots
 
-      # ✅ Step 8: Copy report and screenshots to LOCAL LINUX DISK
+      # Step 8: Copy screenshots & report to local folder
       - name: Copy Screenshots & Report to Local Folder
         if: always()
         run: |
           timestamp=$(date +"%Y%m%d_%H%M%S")
-          baseDest="/home/runner/GitHubScreenshots/$timestamp"
-
+          baseDest="/home/enovo/GitHubScreenshots/$timestamp"
+          
           srcScreenshots="test-output/screenshots"
           srcReport="test-output/extent-report.html"
-
+          
           destScreenshots="$baseDest/screenshots"
           destReports="$baseDest/reports"
-
-          # Create folders
+          
           mkdir -p "$destScreenshots"
           mkdir -p "$destReports"
-
-          # Copy screenshots if present
+          
           if [ -d "$srcScreenshots" ]; then
             cp -r "$srcScreenshots"/* "$destScreenshots" || true
             echo "✅ Screenshots copied to $destScreenshots"
           else
-            echo "⚠️ No screenshots folder found at $srcScreenshots"
+            echo "⚠️ No screenshots found at $srcScreenshots"
           fi
-
-          # Copy extent report
+          
           if [ -f "$srcReport" ]; then
             cp "$srcReport" "$destReports/"
             echo "✅ Extent report copied to $destReports"
           else
             echo "⚠️ No Extent Report found at $srcReport"
           fi
-
+          
           echo "🎯 All files saved under: $baseDest"
