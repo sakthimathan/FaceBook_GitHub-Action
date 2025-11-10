@@ -54,11 +54,11 @@
 		</dependency>
 
 		<!-- WebDriverManager to auto-manage browser driver binaries on CI/runners -->
-		<dependency>
-			<groupId>io.github.bonigarcia</groupId>
-			<artifactId>webdrivermanager</artifactId>
-			<version>${webdrivermanager.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.8.0</version> <scope>test</scope>
+        </dependency>
 
 		<!-- Apache POI for Excel support -->
 		<dependency>

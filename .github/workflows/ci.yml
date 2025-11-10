@@ -1,5 +1,4 @@
-
-name: CI - Selenium Tests with Extent Report (Windows Runner)
+name: CI - Selenium Tests with Extent Report (Linux Runner)
 
 on:
   push:
@@ -8,37 +7,42 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted,runner-3]
+    runs-on: [self-hosted, linux]
 
     steps:
       # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 21 for Windows
+      # Step 2: Set up JDK 21
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # Step 3: Verify Java and Maven installation
+      # ✅ NEW STEP: Install Chrome and ChromeDriver
+      - name: Set up Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable # Installs the latest stable version
+
+      # Step 3: Verify Java, Maven, and Chrome
       - name: Verify Environment
-        shell: powershell
         run: |
           java -version
           mvn -version
+          google-chrome --version   # Verify Chrome
+          chromedriver --version    # Verify ChromeDriver
           echo "Current directory:"
           pwd
 
       # Step 4: Clean and compile the project
       - name: Build with Maven
-        shell: cmd
         run: mvn clean compile
 
       # Step 5: Run Selenium Tests with TestNG suite
       - name: Run Selenium Tests with TestNG
-        shell: cmd
         run: mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
 
       # Step 6: Upload Extent Report as artifact
@@ -57,41 +61,36 @@ jobs:
           name: screenshots
           path: test-output/screenshots
 
-          # ✅ Step 8: Copy Screenshots and Report to Local D Drive (timestamp first)
-      - name: Copy Screenshots and Report to Local D Drive
+      # Step 8: Copy Screenshots and Report to Local Folder
+      - name: Copy Screenshots and Report to Local Folder
         if: always()
-        shell: powershell
         run: |
-          $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-          $baseDest = "D:\GitHubScreenshots\$timestamp"
-          $srcScreenshots = "test-output\screenshots"
-          $srcReport = "test-output\extent-report.html"
-
-          # Create main timestamp folder and subfolders
-          $destScreenshots = "$baseDest\screenshots"
-          $destReports = "$baseDest\reports"
-
-          foreach ($path in @($baseDest, $destScreenshots, $destReports)) {
-            if (!(Test-Path $path)) {
-              New-Item -ItemType Directory -Force -Path $path | Out-Null
-            }
-          }
-
+          timestamp=$(date +"%Y%m%d_%H%M%S")
+          baseDest="$HOME/GitHubScreenshots/$timestamp"
+          srcScreenshots="test-output/screenshots"
+          srcReport="test-output/extent-report.html"
+          
+          destScreenshots="$baseDest/screenshots"
+          destReports="$baseDest/reports"
+          
+          # Create directories
+          mkdir -p "$destScreenshots"
+          mkdir -p "$destReports"
+          
           # Copy screenshots
-          if (Test-Path $srcScreenshots) {
-            Copy-Item -Path "$srcScreenshots\*" -Destination $destScreenshots -Recurse -Force
-            Write-Host "✅ Screenshots copied to $destScreenshots"
-          } else {
-            Write-Host "⚠️ No screenshots found at $srcScreenshots"
-          }
-
+          if [ -d "$srcScreenshots" ]; then
+            cp -r "$srcScreenshots"/* "$destScreenshots"/
+            echo "✅ Screenshots copied to $destScreenshots"
+          else
+            echo "⚠️ No screenshots found at $srcScreenshots"
+          fi
+          
           # Copy extent report
-          if (Test-Path $srcReport) {
-            Copy-Item -Path $srcReport -Destination $destReports -Force
-            Write-Host "✅ Extent report copied to $destReports"
-          } else {
-            Write-Host "⚠️ Extent report not found at $srcReport"
-          }
-
-          Write-Host "🎯 All files stored under: $baseDest"
-
+          if [ -f "$srcReport" ]; then
+            cp "$srcReport" "$destReports"/
+            echo "✅ Extent report copied to $destReports"
+          else
+            echo "⚠️ Extent report not found at $srcReport"
+          fi
+          
+          echo "🎯 All files stored under: $baseDest"
