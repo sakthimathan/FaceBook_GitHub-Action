@@ -21,32 +21,48 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # ✅ NEW STEP: Install Chrome and ChromeDriver
-      - name: Set up Chrome and ChromeDriver
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable # Installs the latest stable version
-
+      # Step 3: Install Chrome Dependencies
       - name: Install Chrome Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnspr4 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libgbm1 libasound2
+          sudo apt-get install -y \
+            libnspr4 \
+            libnss3 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libgtk-3-0 \
+            libgbm1 \
+            libasound2 \
+            libxshmfence1 \
+            libxcb1 \
+            libx11-6 \
+            libxcomposite1 \
+            libxcursor1 \
+            libxdamage1 \
+            libxext6 \
+            libxfixes3 \
+            libxi6 \
+            libxrandr2 \
+            libxtst6 \
+            libglib2.0-0 \
+            libdrm2
 
-      # This step will now work
+      # Step 4: Install Chrome & ChromeDriver
       - name: Set up Chrome and ChromeDriver
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
 
-      # Step 4: Clean and compile the project
+      # Step 5: Clean and compile the project
       - name: Build with Maven
         run: mvn clean compile
 
-      # Step 5: Run Selenium Tests with TestNG suite
+      # Step 6: Run Selenium Tests with TestNG suite
       - name: Run Selenium Tests with TestNG
         run: mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
 
-      # Step 6: Upload Extent Report as artifact
+      # Step 7: Upload Extent Report as artifact
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
         if: always()
@@ -54,7 +70,7 @@ jobs:
           name: extent-report
           path: test-output/extent-report.html
 
-      # Step 7: Upload Screenshots as artifact
+      # Step 8: Upload Screenshots as artifact
       - name: Upload Screenshots
         uses: actions/upload-artifact@v4
         if: always()
@@ -62,7 +78,7 @@ jobs:
           name: screenshots
           path: test-output/screenshots
 
-      # Step 8: Copy Screenshots and Report to Local Folder
+      # Step 9: Copy Screenshots and Report to Local Folder
       - name: Copy Screenshots and Report to Local Folder
         if: always()
         run: |
@@ -70,28 +86,25 @@ jobs:
           baseDest="$HOME/GitHubScreenshots/$timestamp"
           srcScreenshots="test-output/screenshots"
           srcReport="test-output/extent-report.html"
-          
+
           destScreenshots="$baseDest/screenshots"
           destReports="$baseDest/reports"
-          
-          # Create directories
+
           mkdir -p "$destScreenshots"
           mkdir -p "$destReports"
-          
-          # Copy screenshots
+
           if [ -d "$srcScreenshots" ]; then
             cp -r "$srcScreenshots"/* "$destScreenshots"/
             echo "✅ Screenshots copied to $destScreenshots"
           else
             echo "⚠️ No screenshots found at $srcScreenshots"
           fi
-          
-          # Copy extent report
+
           if [ -f "$srcReport" ]; then
             cp "$srcReport" "$destReports"/
             echo "✅ Extent report copied to $destReports"
           else
             echo "⚠️ Extent report not found at $srcReport"
           fi
-          
+
           echo "🎯 All files stored under: $baseDest"
