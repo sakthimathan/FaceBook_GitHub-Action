@@ -27,15 +27,16 @@ jobs:
         with:
           chrome-version: stable # Installs the latest stable version
 
-      # Step 3: Verify Java, Maven, and Chrome
-      - name: Verify Environment
+      - name: Install Chrome Dependencies
         run: |
-          java -version
-          mvn -version
-          google-chrome --version   # Verify Chrome
-          chromedriver --version    # Verify ChromeDriver
-          echo "Current directory:"
-          pwd
+          sudo apt-get update
+          sudo apt-get install -y libnspr4 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libgbm1 libasound2
+
+      # This step will now work
+      - name: Set up Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
 
       # Step 4: Clean and compile the project
       - name: Build with Maven
