@@ -9,10 +9,10 @@ on:
 
 jobs:
   selenium-tests:
-    runs-on: [self-hosted, Linux]
+    runs-on: [self-hosted, X64, Linux]   # ✔ EXACT Runner Labels
+
     env:
-      DISPLAY: :99        # <-- Global display setting for whole job
-      JAVA_HOME: ${{ env.JAVA_HOME }}
+      DISPLAY: ":99"                     # ✔ Global DISPLAY for Selenium + ffmpeg
 
     steps:
       - name: Checkout code
@@ -33,22 +33,22 @@ jobs:
           echo "DISPLAY=$DISPLAY"
 
       # ----------------------------------------------------
-      # Start Virtual Display
+      # Start Xvfb Virtual Display
       # ----------------------------------------------------
       - name: Start Xvfb Server
         run: |
-          echo "Starting Xvfb..."
+          echo "Starting Xvfb on :99"
           Xvfb :99 -screen 0 1920x1080x24 &
           sleep 3
-          echo "Xvfb started on DISPLAY=$DISPLAY"
+          echo "Xvfb running on DISPLAY=$DISPLAY"
 
       # ----------------------------------------------------
-      # Start Screen Recording
+      # Start Screen Recording (FFmpeg)
       # ----------------------------------------------------
       - name: Start Screen Recording
         run: |
           mkdir -p recordings
-          echo "Starting screen recording (ffmpeg)..."
+          echo "Starting screen recording..."
           ffmpeg -y \
             -f x11grab \
             -draw_mouse 1 \
@@ -56,7 +56,7 @@ jobs:
             -i $DISPLAY \
             -r 24 \
             recordings/test-run.mp4 > ffmpeg.log 2>&1 &
-          echo "FFmpeg started."
+          echo "FFmpeg Started."
 
       - name: Build with Maven
         run: mvn clean compile
@@ -66,61 +66,5 @@ jobs:
       # ----------------------------------------------------
       - name: Run Selenium Tests
         env:
-          DISPLAY: :99
+          DISPLAY: ":99"
         run: |
-          echo "Running Selenium under DISPLAY=$DISPLAY"
-          mvn clean test -Dsurefire.suiteXmlFiles=testng.xml -Djava.awt.headless=false
-
-      # ----------------------------------------------------
-      # Stop Screen Recording
-      # ----------------------------------------------------
-      - name: Stop Screen Recording
-        if: always()
-        run: |
-          echo "Stopping ffmpeg..."
-          pkill ffmpeg || true
-          sleep 2
-          echo "Recording folder:"
-          ls -R recordings || true
-
-      - name: Upload ffmpeg log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ffmpeg-log
-          path: ffmpeg.log
-
-      - name: Upload Test Recording
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screen-recording
-          path: recordings/test-run.mp4
-
-      - name: Upload Extent Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: extent-report
-          path: test-output/extent-report.html
-
-      - name: Upload Screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: test-output/screenshots
-
-      - name: Copy Screenshots & Report to Local Folder
-        if: always()
-        run: |
-          timestamp=$(date +"%Y%m%d_%H%M%S")
-          baseDest="/mnt/d/GitHubScreenshots/$timestamp"
-
-          mkdir -p "$baseDest/screenshots"
-          mkdir -p "$baseDest/reports"
-
-          cp -r test-output/screenshots/* "$baseDest/screenshots" 2>/dev/null || true
-          cp test-output/extent-report.html "$baseDest/reports" 2>/dev/null || true
-
-          echo "Files saved at: $baseDest"
