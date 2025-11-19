@@ -76,15 +76,16 @@ public class UtilityClass {
 	public void launchChromeCICD() {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions options = new ChromeOptions();
-        // ✔ MUST force Chrome to use the virtual display
         options.addArguments("--display=:99");
-
-        // Recommended flags
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--window-size=1920,1080");
 
-        // EXPORT DISPLAY inside Java
+        // ❗ Disable automation extension (prevents CDP errors)
+        options.setExperimentalOption("useAutomationExtension", false);
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.addArguments("--disable-blink-features=AutomationControlled");
+
         System.setProperty("DISPLAY", ":99");
 		driver = new ChromeDriver(options);
 	}
