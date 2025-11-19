@@ -76,10 +76,16 @@ public class UtilityClass {
 	public void launchChromeCICD() {
 		WebDriverManager.chromedriver().setup();
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless=new");
-		options.addArguments("--disable-gpu");
-		options.addArguments("--window-size=1920,1080");
-		options.addArguments("--no-sandbox");
+        // ✔ MUST force Chrome to use the virtual display
+        options.addArguments("--display=:99");
+
+        // Recommended flags
+        options.addArguments("--disable-gpu");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--window-size=1920,1080");
+
+        // EXPORT DISPLAY inside Java
+        System.setProperty("DISPLAY", ":99");
 		driver = new ChromeDriver(options);
 	}
 
