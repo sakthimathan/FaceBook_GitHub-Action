@@ -10,76 +10,79 @@ on:
 jobs:
   selenium-tests:
     runs-on: [self-hosted, Linux]
+    env:
+      DISPLAY: :99        # <-- Global display setting for whole job
+      JAVA_HOME: ${{ env.JAVA_HOME }}
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 21 for Linux
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      # Step 3: Verify Java & Maven
       - name: Verify Environment
         run: |
           java -version
           mvn -version
-          which ffmpeg || true
-          which Xvfb || true
-
-      # ----------------------------------------------------
-      # ✅ Start DISPLAY (Xvfb) for Selenium GUI
-      # ----------------------------------------------------
-      - name: Start Virtual Display
-        run: |
-          echo "Starting Xvfb..."
-          Xvfb :99 -screen 0 1920x1080x24 &
-          sleep 2
-          export DISPLAY=:99
+          which ffmpeg
+          which Xvfb
           echo "DISPLAY=$DISPLAY"
 
       # ----------------------------------------------------
-      # ✅ Start Screen Recording (FFmpeg)
+      # Start Virtual Display
+      # ----------------------------------------------------
+      - name: Start Xvfb Server
+        run: |
+          echo "Starting Xvfb..."
+          Xvfb :99 -screen 0 1920x1080x24 &
+          sleep 3
+          echo "Xvfb started on DISPLAY=$DISPLAY"
+
+      # ----------------------------------------------------
+      # Start Screen Recording
       # ----------------------------------------------------
       - name: Start Screen Recording
         run: |
-          export DISPLAY=:99
           mkdir -p recordings
-          echo "Starting screen recording..."
+          echo "Starting screen recording (ffmpeg)..."
           ffmpeg -y \
             -f x11grab \
+            -draw_mouse 1 \
             -video_size 1920x1080 \
-            -i :99 \
-            -r 30 \
+            -i $DISPLAY \
+            -r 24 \
             recordings/test-run.mp4 > ffmpeg.log 2>&1 &
+          echo "FFmpeg started."
 
-      # Step 4: Build project
       - name: Build with Maven
         run: mvn clean compile
 
-      # Step 5: Run Selenium Tests
-      - name: Run Selenium Tests with TestNG
+      # ----------------------------------------------------
+      # Run Selenium Tests (GUI Visible)
+      # ----------------------------------------------------
+      - name: Run Selenium Tests
+        env:
+          DISPLAY: :99
         run: |
-          export DISPLAY=:99
-          mvn clean test -Dsurefire.suiteXmlFiles=testng.xml
+          echo "Running Selenium under DISPLAY=$DISPLAY"
+          mvn clean test -Dsurefire.suiteXmlFiles=testng.xml -Djava.awt.headless=false
 
       # ----------------------------------------------------
-      # ✅ Stop Screen Recording
+      # Stop Screen Recording
       # ----------------------------------------------------
       - name: Stop Screen Recording
         if: always()
         run: |
-          echo "Stopping screen recording..."
+          echo "Stopping ffmpeg..."
           pkill ffmpeg || true
           sleep 2
-          echo "Files inside recordings/:"
-          ls -R recordings || echo "No files found"
+          echo "Recording folder:"
+          ls -R recordings || true
 
-      # Upload ffmpeg log (debug if recording fails)
       - name: Upload ffmpeg log
         if: always()
         uses: actions/upload-artifact@v4
@@ -87,58 +90,37 @@ jobs:
           name: ffmpeg-log
           path: ffmpeg.log
 
-      # Upload recorded video
       - name: Upload Test Recording
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: screen-recording
           path: recordings/test-run.mp4
 
-      # Step 6: Upload Extent Report as artifact
       - name: Upload Extent Report
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: extent-report
           path: test-output/extent-report.html
 
-      # Step 7: Upload screenshots
       - name: Upload Screenshots
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: test-output/screenshots
 
-      # Step 8: Copy screenshots & report to local folder
       - name: Copy Screenshots & Report to Local Folder
         if: always()
         run: |
           timestamp=$(date +"%Y%m%d_%H%M%S")
           baseDest="/mnt/d/GitHubScreenshots/$timestamp"
-          
-          srcScreenshots="test-output/screenshots"
-          srcReport="test-output/extent-report.html"
-          
-          destScreenshots="$baseDest/screenshots"
-          destReports="$baseDest/reports"
-          
-          mkdir -p "$destScreenshots"
-          mkdir -p "$destReports"
-          
-          if [ -d "$srcScreenshots" ]; then
-            cp -r "$srcScreenshots"/* "$destScreenshots" || true
-            echo "✅ Screenshots copied to $destScreenshots"
-          else
-            echo "⚠️ No screenshots found at $srcScreenshots"
-          fi
-          
-          if [ -f "$srcReport" ]; then
-            cp "$srcReport" "$destReports/"
-            echo "✅ Extent report copied to $destReports"
-          else
-            echo "⚠️ No Extent Report found at $srcReport"
-          fi
-          
-          echo "🎯 All files saved under: $baseDest"
+
+          mkdir -p "$baseDest/screenshots"
+          mkdir -p "$baseDest/reports"
+
+          cp -r test-output/screenshots/* "$baseDest/screenshots" 2>/dev/null || true
+          cp test-output/extent-report.html "$baseDest/reports" 2>/dev/null || true
+
+          echo "Files saved at: $baseDest"
